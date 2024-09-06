@@ -1,0 +1,2131 @@
+Subject: [PATCH] fix: del import (36)
+doc: fix
+doc: add url
+fix: del comment
+fix: @PathVariable
+doc: add url
+fix: well-perforations
+feat: WELL_PERFORATIONS (bug)
+fix: WellLogResultLayers
+feat: well-log-result-sublayers (for PGIEditorDbService)
+feat: well-log-result-layers (for PGIEditorDbService)
+feat: well_hdr (for PGIEditorDbService)
+doc: upd
+feat: nodes (for PGIEditorDbService)
+feat: add well_perforations
+feat: add insert into
+feat: add create table
+fix: add postgis
+fix: create table if not exists
+fix: add todo
+fix: rename changeLog
+fix: rename changeLog
+doc: fix could not connect to server
+doc: add request examples
+# fix: lombok 1.18.30
+---
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision f8e5d84b8bd5cb796ae183b0a37b0ba957aec716)
++++ b/pom.xml	(revision c1d786030bee36a0414de93164a62078dab6757b)
+@@ -79,7 +79,7 @@
+         <dependency>
+             <groupId>org.projectlombok</groupId>
+             <artifactId>lombok</artifactId>
+-            <version>1.18.32</version>
++            <version>1.18.30</version>
+             <scope>provided</scope>
+         </dependency>
+ 
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision c1d786030bee36a0414de93164a62078dab6757b)
++++ b/README.md	(revision 1e38cc947ff9aefe11617ab48a0cea60e3312686)
+@@ -1,44 +1,88 @@
+ # GeoEditor2WellService (CloudReady)
+-Репозиторий проекта http://10.124.13.55:10020/Navigator/Plugins/GeoEditor2/GeoEditor2WellService
+-Репозиторий application.yml http://10.124.13.55:10020/Navigator/cloud-config-repo 
++Репозиторий проекта http://10.124.13.55:10020/Navigator/Plugins/GeoEditor2/GeoEditor2WellService  
++Репозиторий application.yml http://10.124.13.55:10020/Navigator/cloud-config-repo  
+ 
+ ### Настройки портов в application.yaml
+-server port: 8081 (8081 - рабочий, 8090 - тестовый)
++server port: 8081 (8081 - рабочий, 8090 - тестовый)  
+ 
+ ### Building
+-1. Maven: clean, package
+-2. Запустить через geoEditor2WellService.bat
++1. Maven: clean, package  
++2. Запустить через geoEditor2WellService.bat  
+ 
+ ### Url
+-1. Сервис получает список скважин загруженных в проекте
+-   Параметр: имя проекта (PROJECT)
+-   Результат: список uwi и имя скважины (UWI и WELLNAME).
+-   Таблица: {PROJECT}.WELL_HDR
+-   SQL: select uwi, well_name from alinsk_tmn.well_hdr
+-   GET: http://10.124.40.8:8081/api/v1/wells?project=test_project
++1. Сервис получает список скважин загруженных в проекте  
++   Параметр: имя проекта (PROJECT)  
++   Результат: список uwi и имя скважины (UWI и WELLNAME).  
++   Таблица: {PROJECT}.WELL_HDR  
++   SQL: select uwi, well_name from alinsk_tmn.well_hdr  
++   GET: http://10.124.40.8:8081/api/v1/wells?project=test_project  
++   Примеры запросов:  
++
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/wells?project=test_bd
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/wells?project=test_bd"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/wells?project=test_bd"
++```
+ 
+-2. Сервис получает список всех пластов в проекте.
+-   Параметр: имя проекта (PROJECT).
+-   Результат: список код пласта и имя пласта (LAYER_ID и LAYER_NAME).
+-   Таблица: {PROJECT}.WELL_LOG_RESULT_SUBLAYRES.
++2. Сервис получает список всех пластов в проекте.  
++   Параметр: имя проекта (PROJECT).  
++   Результат: список код пласта и имя пласта (LAYER_ID и LAYER_NAME).  
++   Таблица: {PROJECT}.WELL_LOG_RESULT_SUBLAYRES.  
+    SQL: select distinct layer_id, (select description from codes.dict_g c where c.id = layer_id) as layer_name from well_log_result_sublayers
+    GET: http://10.124.40.8:8081/api/v1/layers?project=test_project
++
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/layers?project=test_bd
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/layers?project=test_bd" -H "Accept: application/json"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/layers?project=test_bd" -Headers @{ "Accept" = "application/json" }
++```
+    
+-3. Сервис получает список всех маркеров в проекте.
+-   Параметр: имя проекта (PROJECT).
+-   Результат: список имя маркера (SURFACE_NAME).
+-   Таблица: {PROJECT}.SURFACE_NAME
+-   SQL: select distinct SURFACE_NAME from test_project.SURFACE_NAME
++3. Сервис получает список всех маркеров в проекте.  
++   Параметр: имя проекта (PROJECT).  
++   Результат: список имя маркера (SURFACE_NAME).  
++   Таблица: {PROJECT}.SURFACE_NAME. 
++   SQL: select distinct SURFACE_NAME from test_project.SURFACE_NAME.  
+    GET: http://10.124.40.8:8081/api/v1/surfaces?project=test_project
+ 
+-4. Сервис выдает всё информацию по пропласткам относительно пласта скважины.
+-   Параметры: имя проекта (PROJECT), uwi скважины (UWI), код пласта (LAYER_ID).
+-   Результат : список пропластков (все поля в таблице).
+-   Таблица: {PROJECT}.WELL_LOG_RESULT_SUBLAYERS
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++
++```
++
++CMD (с экранированием):
++```shell
++
++```
++PowerShell:
++```shell
++
++```
++
++4. Сервис выдает всё информацию по пропласткам относительно пласта скважины.  
++   Параметры: имя проекта (PROJECT), uwi скважины (UWI), код пласта (LAYER_ID).  
++   Результат : список пропластков (все поля в таблице).  
++   Таблица: {PROJECT}.WELL_LOG_RESULT_SUBLAYERS.  
+    SQL: select layer_id, (select description from codes.dict_g t where t. id = layer_id) LAYER_NAME from test_BD.WELL_LOG_RESULT_SUBLAYRES where uwi = {UWI} and layer_id = {LAYER_ID}
+         select layer_id, (select description from codes.dict_g t where t. id = layer_id) layer_name from test_project.well_log_result_sublayers where uwi = 40035795 and layer_id = 1645201
+-        select layer_id, description as layer_name from test_project.well_log_result_sublayers, codes.dict_g where uwi = 40035795 and layer_id = 1645201
+-   Примечание: нужны все столбцы, запустить из PL/SQL и смотреть - если есть коммент, то по этому полю идем в codes.dict_g
++        select layer_id, description as layer_name from test_project.well_log_result_sublayers, codes.dict_g where uwi = 40035795 and layer_id = 1645201.  
++   Примечание: нужны все столбцы, запустить из PL/SQL и смотреть - если есть коммент, то по этому полю идем в codes.dict_g.  
+ 
+         select id, uwi, "source", (select description from codes.dict_g c where s.source = c.id) as source_desc, 
+             layer_id, (select description from codes.dict_g c where s.layer_id = c.id) as layer_id_desc,  
+@@ -62,59 +106,271 @@
+             where uwi = 40035795 and layer_id = 1645201
+    GET: http://10.124.40.8:8081/api/v1/sublayers?project=test_project&uwi=40035795&layerid=1645201    
+ 
+-5. Сервис выдает данные о маркерах скважины.
+-   Параметры: имя проекта (PROJECT), uwi скважины (UWI)
+-   Результат: список маркеров скважины (все поля в таблице).
+-   Таблица: {PROJECT}.WELL_SURFACE_PICK.
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++
++```
++
++CMD (с экранированием):
++```shell
++
++```
++PowerShell:
++```shell
++
++```
++
++5. Сервис выдает данные о маркерах скважины.  
++   Параметры: имя проекта (PROJECT), uwi скважины (UWI).  
++   Результат: список маркеров скважины (все поля в таблице).  
++   Таблица: {PROJECT}.WELL_SURFACE_PICK.  
+    SQL: select surface_pick_id, uwi, data_source, (select description from codes.dict_g c where s.data_source = c.id) as data_source_desc,
+             version_id, (select archive_name from codes.work_proj_version w where s.version_id = w.version_id) as version_id_desc,
+             version_current, (select archive_name from codes.work_proj_version w where s.version_current = w.version_id) as version_current_desc,
+-            md, tvdss, layer_id, record_changed, insert_date, surface_name, remarks, inserted_by, updated_by
+-        from test_project.well_surface_pick s where uwi = 40031884
++            md, tvdss, layer_id, record_changed, insert_date, surface_name, remarks, inserted_by, updated_by.  
++        from test_project.well_surface_pick s where uwi = 40031884.  
+    GET: http://10.124.40.8:8081/api/v1/surfaces/test_project/40031884
+ 
+-6. Сервис получает скважину из проекта по UWI.
+-   Параметры: имя проекта (PROJECT) и (UWI)
+-   Результат: uwi и имя скважины (UWI и WELL_NAME).
+-   Таблица: {PROJECT}.WELL_HDR.
+-   SQL: select uwi, well_name from test_project.well_hdr where uwi = 40024175
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++
++```
++
++CMD (с экранированием):
++```shell
++
++```
++PowerShell:
++```shell
++
++```
++
++6. Сервис получает скважину из проекта по UWI.  
++   Параметры: имя проекта (PROJECT) и (UWI). 
++   Результат: uwi и имя скважины (UWI и WELL_NAME).  
++   Таблица: {PROJECT}.WELL_HDR.  
++   SQL: select uwi, well_name from test_project.well_hdr where uwi = 40024175. 
+    GET: http://10.124.40.8:8081/api/v1/wells/test_project/uwi/40024175
+ 
+-7. Сервис получает скважину из проекта по WELL_NAME.
+-   Параметры: имя проекта (PROJECT) и (WELL_NAME)
+-   Результат: uwi и имя скважины (UWI и WELL_NAME).
+-   Таблица: {PROJECT}.WELL_HDR.
+-   SQL: select uwi, well_name from test_project.well_hdr where well_name = 134
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/wells/test_bd/uwi/40000005
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/wells/test_bd/uwi/40000005" -H "Accept: application/json"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/wells/test_bd/uwi/40000005" -Headers @{ "Accept" = "application/json" }
++```
++
++7. Сервис получает скважину из проекта по WELL_NAME.  
++   Параметры: имя проекта (PROJECT) и (WELL_NAME).  
++   Результат: uwi и имя скважины (UWI и WELL_NAME).  
++   Таблица: {PROJECT}.WELL_HDR.  
++   SQL: select uwi, well_name from test_project.well_hdr where well_name = 134.  
+    GET: http://10.124.40.8:8081/api/v1/wells/test_project/well_name/134
+ 
+-8. Сервис получает скважины из проекта по имени куста.
+-   Параметры: имя проекта (PROJECT) и (RIGNO)
+-   Результат: uwi и имя скважины (UWI и WELL_NAME).
+-   Таблица: {PROJECT}.WELL_HDR.
+-   SQL: select uwi, well_name from test_project.well_hdr where rig_no = '12'
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/wells/test_bd/well_name/WellName5
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/wells/test_bd/well_name/WellName5" -H "Accept: application/json"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/wells/test_bd/well_name/WellName5" -Headers @{ "Accept" = "application/json" }
++```
++
++8. Сервис получает скважины из проекта по имени куста.  
++   Параметры: имя проекта (PROJECT) и (RIGNO).  
++   Результат: uwi и имя скважины (UWI и WELL_NAME).  
++   Таблица: {PROJECT}.WELL_HDR.  
++   SQL: select uwi, well_name from test_project.well_hdr where rig_no = '12'.   
+    GET: http://10.124.40.8:8081/api/v1/wells/test_project/rig_no/12
+ 
+-9. Сервис получает скважины из проекта по id плата.
+-   Параметры: имя проекта (PROJECT) и (LAYER_ID)
+-   Результат: uwi и имя скважины (UWI и WELL_NAME).
+-   Таблицы: {PROJECT}.WELL_HDR и {PROJECT}.WELL_LOG_RESULT_SUBLAYER
+-   SQL: select uwi, well_name from test_project.well_hdr where uwi in (select distinct uwi from test_project.well_log_result_sublayers where layer_id = 1645201)
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/wells/test_bd/rig_no/Rig008
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/wells/test_bd/rig_no/Rig008" -H "Accept: application/json"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/wells/test_bd/rig_no/Rig008" -Headers @{ "Accept" = "application/json" }
++```
++
++9. Сервис получает скважины из проекта по id пласта.  
++   Параметры: имя проекта (PROJECT) и (LAYER_ID).  
++   Результат: uwi и имя скважины (UWI и WELL_NAME).  
++   Таблицы: {PROJECT}.WELL_HDR и {PROJECT}.WELL_LOG_RESULT_SUBLAYER.  
++   SQL: select uwi, well_name from test_project.well_hdr where uwi in (select distinct uwi from test_project.well_log_result_sublayers where layer_id = 1645201).  
+    GET: http://10.124.40.8:8081/api/v1/wells/test_project/layer_id/1645201
+ 
+-10.Сервис получает скважины из проекта по имени маркера.
+-   Параметры: имя проекта (PROJECT) и (SURFACE_NAME)
+-   Результат: uwi и имя скважины (UWI и WELL_NAME).
+-   Таблицы: {PROJECT}.WELL_HDR и {PROJECT}.WELL_SURFACE_PICK
+-   SQL: select uwi, well_name from test_project.well_hdr wh where wh.uwi in (select uwi from test_project.well_surface_pick wsp where wh.uwi = wsp.uwi and wsp.surface_name = 'W10')
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/wells/test_bd/layer_id/105
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/wells/test_bd/layer_id/105" -H "Accept: application/json"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/wells/test_bd/layer_id/105" -Headers @{ "Accept" = "application/json" }
++```
++
++
++10. Сервис получает скважины из проекта по имени маркера.  
++   Параметры: имя проекта (PROJECT) и (SURFACE_NAME).  
++   Результат: uwi и имя скважины (UWI и WELL_NAME).   
++   Таблицы: {PROJECT}.WELL_HDR и {PROJECT}.WELL_SURFACE_PICK.  
++   SQL: select uwi, well_name from test_project.well_hdr wh where wh.uwi in (select uwi from test_project.well_surface_pick wsp where wh.uwi = wsp.uwi and wsp.surface_name = 'W10').  
+    GET: http://10.124.40.8:8081/api/v1/wells/test_project/surface_name/W10
+ 
+-11.Сервис возвращает список кодов (ID), их описание (DESCRIPTION) и мнемонику (ME) по группе элементов (GRP).
+-   Параметры: код группы элементов GRP
+-   Результат: ID, DESCRIPTION, ME.
+-   Таблица: CODES.DICT_G
+-   SQL: select id, description, me from codes.dict_g where grp = '1000101'
+-   GET: http://10.124.40.8:8081/api/v1/dict_g/codes/grp/1000101 
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/wells/test_bd/surface_name/Surface%20G
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/wells/test_bd/surface_name/Surface%20G" -H "Accept: application/json"
++```
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/wells/test_bd/surface_name/Surface%20G" -Headers @{ "Accept" = "application/json" }
++```
++
++11. Сервис возвращает список кодов (ID), их описание (DESCRIPTION) и мнемонику (ME) по группе элементов (GRP).   
++   Параметры: код группы элементов GRP.  
++   Результат: ID, DESCRIPTION, ME.   
++   Таблица: CODES.DICT_G.  
++   SQL: select id, description, me from codes.dict_g where grp = '1000101'.  
++   GET: http://10.124.40.8:8081/api/v1/dict_g/codes/grp/1000101
+ 
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++
++```
++
++CMD (с экранированием):
++```shell
++
++```
++PowerShell:
++```shell
++
++```
++
++12. Сервис получает все данные из таблицы nodes (интеграция с PGIEditorDbService)
++
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/test_bd/nodes
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/test_bd/nodes" -H "Accept: application/json"
++```
++
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/test_bd/nodes" -Headers @{ "Accept" = "application/json" }
++```
++
++13. Сервис получает все данные из таблицы WELL_HDR (интеграция с PGIEditorDbService)  
++
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/test_bd/well-hdrs
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/test_bd/well-hdrs" -H "Accept: application/json"
++```
++
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/test_bd/well-hdrs" -Headers @{ "Accept" = "application/json" }
++```
++
++14.  Сервис получает все данные из таблицы WELL_LOG_LAYERS (интеграция с PGIEditorDbService)  
++
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/test_bd/well-log-result-layers
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/test_bd/well-log-result-layers" -H "Accept: application/json"
++```
++
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/test_bd/well-log-result-layers" -Headers @{ "Accept" = "application/json" }
++```
++
++15.  Сервис получает все данные из таблицы WELL_LOG_RESULT_SUBLAYERS (интеграция с PGIEditorDbService)  
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++GET http://localhost:8081/api/v1/test_bd/well-log-result-sublayers
++Accept: application/json
++```
++
++CMD (с экранированием):
++```shell
++curl -X GET "http://localhost:8081/api/v1/test_bd/well-log-result-sublayers" -H "Accept: application/json"
++```
++
++PowerShell:
++```shell
++Invoke-RestMethod -Method Get -Uri "http://localhost:8081/api/v1/test_bd/well-log-result-sublayers" -Headers @{ "Accept" = "application/json" }
++```
++
++16. Сервис получает данные из {schema}.WELL_PERFORATIONS (интеграция с PGIEditorDbService)  
++Пример SQL: select * from {schema}.WELL_PERFORATIONS where uwi in ({UWIS})
++
++HTTP Client IntelliJ IDEA (scratch):
++```shell
++POST http://localhost:8081/api/v1/test_bd/well-perforations
++Accept: application/json
++Content-Type: application/json
++
++[40000001, 40000002, 40000003]
++```
++
++CMD (с экранированием):
++```shell
++curl -X POST "http://localhost:8081/api/v1/test_bd/well-perforations" -H "Accept: application/json" -H "Content-Type: application/json" -d "[40000001, 40000002, 40000003]"
++```
++
++PowerShell:
++```shell
++Invoke-RestMethod -Method Post -Uri "http://localhost:8081/api/v1/test_bd/well-perforations" -Headers @{ "Accept" = "application/json"; "Content-Type" = "application/json" } -Body '[40000001, 40000002, 40000003]'
++```
++
++
+ 
+ ### Тестовые данные
+ Источник: Oracle Geopro -> Схемы: -> TEST_BD -> Таблицы:
+@@ -551,4 +807,79 @@
+ update
+     on
+     alexa.well_log_result_layers for each row execute function repadmin."ALEXA_WELL_LOG_RESULT_LAYERS_tr"();
++```
++7. Ошибка при подключении pgadmin к БД через Docker:
++```txt
++docker pgadmin Unable to connect to server: connection failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused Is server running on that host and accepting TCP/IP connections?
++```
++Решение: https://stackoverflow.com/questions/53610385/docker-postgres-and-pgadmin-4-connection-refused
++
++Порядок настройки:
++Выполнить команду и найти IP-адрес из "Gateway":
++```schell
++docker network inspect pgi-editor-db-service_pg-network
++```
++Пример результата:
++```txt
++[
++    {
++        "Name": "pgi-editor-db-service_pg-network",
++        "Id": "d5e8f0fe3a05f2fa949a544bf36055bddb8ed6d6a0dcec71c3706dba0354a899",
++        "Created": "2024-08-10T17:49:25.194139712Z",
++        "Scope": "local",
++        "Driver": "bridge",
++        "EnableIPv6": false,
++        "IPAM": {
++            "Driver": "default",
++            "Options": null,
++            "Config": [
++                {
++                    "Subnet": "172.19.0.0/16",
++                    "Gateway": "172.19.0.1"
++                }
++            ]
++        },
++        "Internal": false,
++        "Attachable": false,
++        "Ingress": false,
++        "ConfigFrom": {
++            "Network": ""
++        },
++        "ConfigOnly": false,
++        "Containers": {
++            "408e5b256e92b56b44a70ecdba01665fd306cbe97a6fed4f4ad559552f362681": {
++                "Name": "pgadmin4",
++                "EndpointID": "c0a1763a73c9555829bd4f705ef77157bcfde6dc63c983f2834f4e1e0f6387b1",
++                "MacAddress": "02:42:ac:13:00:03",
++                "IPv4Address": "172.19.0.3/16",
++                "IPv6Address": ""
++            },
++            "a5b8c3ba0649d8481485693481466e0dbd8b919e23d056d86fc97e1217522464": {
++                "Name": "tonipi-gpro-alt-5433",
++                "EndpointID": "998a8ddfcdb2307ef4d92d262f27c5176cbe2cb8fea47c14e9a2cb43e7325439",
++                "MacAddress": "02:42:ac:13:00:02",
++                "IPv4Address": "172.19.0.2/16",
++                "IPv6Address": ""
++            }
++        },
++        "Options": {},
++        "Labels": {
++            "com.docker.compose.network": "pg-network",
++            "com.docker.compose.project": "pgi-editor-db-service",
++            "com.docker.compose.version": "2.29.1"
++        }
++    }
++]
++```
++Использовать IP-адрес из "Gateway": "172.19.0.1".
++
++Запустить http://localhost:5050/browser/.  
++Ввести:
++```txt
++Name:                 tonipi-gpro-alt-5433 
++Host name/address:    172.19.0.1
++Port:                 5433
++Maintenance database: db_pgi
++Username:             ***
++Password:             ***
+ ```
+\ No newline at end of file
+Index: src/main/resources/db/changelog/1.0/2024-08-09--0001-test_bd.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-08-09--0001-test_bd.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0001-create-schema-test_bd.sql
+rename from src/main/resources/db/changelog/1.0/2024-08-09--0001-test_bd.sql
+rename to src/main/resources/db/changelog/1.0/2024-08-09--0001-create-schema-test_bd.sql
+--- a/src/main/resources/db/changelog/1.0/2024-08-09--0001-test_bd.sql	(revision cef50d5817f052abcff0f7a6b44a877b262f7358)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0001-create-schema-test_bd.sql	(revision fa0878ff26e5969d1816b6d3dd66858069362aad)
+@@ -1,1 +1,11 @@
+-CREATE SCHEMA IF NOT EXISTS test_bd;
+\ No newline at end of file
++CREATE SCHEMA IF NOT EXISTS test_bd;
++
++UPDATE pg_extension
++
++SET extrelocatable = TRUE WHERE extname = 'postgis';
++
++ALTER EXTENSION postgis  SET SCHEMA test_bd;
++
++ALTER EXTENSION postgis UPDATE TO "3.4.2";
++
++SET search_path TO test_bd;
+\ No newline at end of file
+Index: src/main/resources/db/changelog/1.0/2024-08-09--0002-well_hdr.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-08-09--0002-well_hdr.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0002-create-table-well_hdr.sql
+rename from src/main/resources/db/changelog/1.0/2024-08-09--0002-well_hdr.sql
+rename to src/main/resources/db/changelog/1.0/2024-08-09--0002-create-table-well_hdr.sql
+--- a/src/main/resources/db/changelog/1.0/2024-08-09--0002-well_hdr.sql	(revision cef50d5817f052abcff0f7a6b44a877b262f7358)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0002-create-table-well_hdr.sql	(revision 88522f79bdb34cb2bf5d348b8fe7c3c80ee00a25)
+@@ -1,4 +1,4 @@
+-CREATE TABLE test_bd.well_hdr (
++CREATE TABLE IF NOT EXISTS test_bd.well_hdr (
+ 	uwi bigserial NOT NULL,
+ 	parent_uwi int8 NULL,
+ 	tie_in_uwi int8 NULL,
+Index: src/main/resources/db/changelog/1.0/2024-09-08--0003-well_log_result_sublayers.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-09-08--0003-well_log_result_sublayers.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0003-create-table-well_log_result_sublayers.sql
+rename from src/main/resources/db/changelog/1.0/2024-09-08--0003-well_log_result_sublayers.sql
+rename to src/main/resources/db/changelog/1.0/2024-08-09--0003-create-table-well_log_result_sublayers.sql
+--- a/src/main/resources/db/changelog/1.0/2024-09-08--0003-well_log_result_sublayers.sql	(revision a1cac7e17e2798450b53826dde097b4f073b292a)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0003-create-table-well_log_result_sublayers.sql	(revision 88522f79bdb34cb2bf5d348b8fe7c3c80ee00a25)
+@@ -1,4 +1,4 @@
+-CREATE TABLE test_bd.well_log_result_sublayers (
++CREATE TABLE IF NOT EXISTS test_bd.well_log_result_sublayers (
+ 	id bigserial NOT NULL,
+ 	uwi int8 NOT NULL,
+ 	"source" int8 NOT NULL,
+Index: src/main/resources/db/changelog/1.0/2024-08-09--0004-well_surface_pick.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-08-09--0004-well_surface_pick.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0004-create-table-well_surface_pick.sql
+rename from src/main/resources/db/changelog/1.0/2024-08-09--0004-well_surface_pick.sql
+rename to src/main/resources/db/changelog/1.0/2024-08-09--0004-create-table-well_surface_pick.sql
+--- a/src/main/resources/db/changelog/1.0/2024-08-09--0004-well_surface_pick.sql	(revision cef50d5817f052abcff0f7a6b44a877b262f7358)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0004-create-table-well_surface_pick.sql	(revision 88522f79bdb34cb2bf5d348b8fe7c3c80ee00a25)
+@@ -1,4 +1,4 @@
+-CREATE TABLE test_bd.well_surface_pick (
++CREATE TABLE IF NOT EXISTS test_bd.well_surface_pick (
+ 	surface_pick_id int8 NOT NULL,
+ 	uwi int8 NOT NULL,
+ 	data_source int8 NULL,
+Index: src/main/java/ru/navilab/geoeditor/service/repository/LayerRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/repository/LayerRepository.java b/src/main/java/ru/navilab/geoeditor/service/repository/LayerRepository.java
+--- a/src/main/java/ru/navilab/geoeditor/service/repository/LayerRepository.java	(revision db86c4fa079f529e4405be99ed89cfa4f0d97808)
++++ b/src/main/java/ru/navilab/geoeditor/service/repository/LayerRepository.java	(revision e9dfd12f377092e7ac2a966084b860023c9584e6)
+@@ -6,6 +6,13 @@
+ 
+ import java.util.List;
+ 
++//TODO: В Spring Data JDBC репозитории предназначены для работы с сущностями, а не с DTO (Data Transfer Object).
++// Лучшие практики предполагают, что в репозитории нужно указывать сущность, а не DTO.
++// В Spring Data JDBC лучше придерживаться использования сущностей в репозиториях (CrudRepository).
++// Для получения DTO из SQL-запросов используйте:
++// 1) аннотацию @Query,
++// 2) JdbcTemplate с RowMapper,
++// 3) или проекции (Projections).
+ public interface LayerRepository extends CrudRepository<LayerDto, Long> {
+ 
+     @Query("select distinct layer_id, (select description from codes.dict_g c where c.id = layer_id) as layer_name from well_log_result_sublayers")
+Index: src/main/java/ru/navilab/geoeditor/service/repository/SurfaceRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/repository/SurfaceRepository.java b/src/main/java/ru/navilab/geoeditor/service/repository/SurfaceRepository.java
+--- a/src/main/java/ru/navilab/geoeditor/service/repository/SurfaceRepository.java	(revision db86c4fa079f529e4405be99ed89cfa4f0d97808)
++++ b/src/main/java/ru/navilab/geoeditor/service/repository/SurfaceRepository.java	(revision e9dfd12f377092e7ac2a966084b860023c9584e6)
+@@ -8,6 +8,13 @@
+ 
+ import java.util.List;
+ 
++//TODO: В Spring Data JDBC репозитории предназначены для работы с сущностями, а не с DTO (Data Transfer Object).
++// Лучшие практики предполагают, что в репозитории нужно указывать сущность, а не DTO.
++// В Spring Data JDBC лучше придерживаться использования сущностей в репозиториях (CrudRepository).
++// Для получения DTO из SQL-запросов используйте:
++// 1) аннотацию @Query,
++// 2) JdbcTemplate с RowMapper,
++// 3) или проекции (Projections).
+ public interface SurfaceRepository extends CrudRepository<SurfaceDto, Long> {
+ 
+     @Query("select distinct surface_name from well_surface_pick")
+Index: src/main/resources/db/changelog/1.0/2024-08-09--0005-create-table-nodes.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-08-09--0005-create-table-nodes.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0005-create-table-nodes.sql
+new file mode 100644
+--- /dev/null	(revision 94847a8e021225cb37ef6850fe41ad320ff0e3f5)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0005-create-table-nodes.sql	(revision 94847a8e021225cb37ef6850fe41ad320ff0e3f5)
+@@ -0,0 +1,16 @@
++CREATE TABLE IF NOT EXISTS test_bd.nodes (
++                             node_id serial NOT NULL,
++                             node_x numeric NOT NULL,
++                             node_y numeric NOT NULL,
++                             last_update timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
++                             insert_date timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
++                             "source" varchar(30) NULL,
++                             updated_by varchar(30) NULL DEFAULT CURRENT_USER,
++                             inserted_by varchar(30) NULL DEFAULT CURRENT_USER,
++                             gdo_geometry geometry NULL,
++                             CONSTRAINT pk_nodes PRIMARY KEY (node_id)
++);
++CREATE INDEX IF NOT EXISTS idx_nodes_geom ON test_bd.nodes USING gist (gdo_geometry);
++CREATE INDEX IF NOT EXISTS idx_nodes_node_x ON test_bd.nodes USING btree (node_x);
++CREATE INDEX IF NOT EXISTS idx_nodes_node_y ON test_bd.nodes USING btree (node_y);
++CREATE INDEX IF NOT EXISTS idx_nodes_source ON test_bd.nodes USING btree (source) WHERE (source IS NOT NULL);
+\ No newline at end of file
+Index: src/main/resources/db/changelog/1.0/2024-08-09--0006-create-table-well_log_result_layers.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-08-09--0006-create-table-well_log_result_layers.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0006-create-table-well_log_result_layers.sql
+new file mode 100644
+--- /dev/null	(revision 94847a8e021225cb37ef6850fe41ad320ff0e3f5)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0006-create-table-well_log_result_layers.sql	(revision 94847a8e021225cb37ef6850fe41ad320ff0e3f5)
+@@ -0,0 +1,34 @@
++CREATE TABLE IF NOT EXISTS test_bd.well_log_result_layers (
++                                              id bigserial NOT NULL,
++                                              uwi int8 NOT NULL,
++                                              layer_id int8 NULL,
++                                              wf_flag int8 NULL,
++                                              "source" int8 NULL,
++                                              id_dict_layers int4 NULL,
++                                              record_changed timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
++                                              insert_date timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
++                                              top numeric NULL,
++                                              base numeric NULL,
++                                              top_dsrd numeric NULL,
++                                              base_dsrd numeric NULL,
++                                              ows numeric NULL,
++                                              gos numeric NULL,
++                                              ows_dsrd numeric NULL,
++                                              gos_dsrd numeric NULL,
++                                              av_permeability numeric NULL,
++                                              av_porosity numeric NULL,
++                                              av_kng numeric NULL,
++                                              inserted_by varchar(30) NULL DEFAULT CURRENT_USER,
++                                              updated_by varchar(30) NULL DEFAULT CURRENT_USER,
++                                              version_id numeric NULL,
++                                              version_current numeric NULL,
++                                              gws numeric NULL,
++                                              gws_dsrd numeric NULL,
++                                              net_pay_thickness numeric NULL,
++                                              gross_thickness numeric NULL,
++                                              start_gvk numeric NULL,
++                                              gas_saturation_avg numeric NULL,
++                                              sandstone_coef numeric NULL,
++                                              CONSTRAINT pk_well_log_res_layers PRIMARY KEY (id)
++);
++CREATE INDEX IF NOT EXISTS idx_well_log_result_layers ON test_bd.well_log_result_layers USING btree (uwi, layer_id);
+Index: src/main/resources/db/changelog/data/1.0/2024-08-09--0004-insert-into-nodes.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/data/1.0/2024-08-09--0004-insert-into-nodes.sql b/src/main/resources/db/changelog/data/1.0/2024-08-09--0004-insert-into-nodes.sql
+new file mode 100644
+--- /dev/null	(revision a209f5e70f0c958d8194be6603925af122263e17)
++++ b/src/main/resources/db/changelog/data/1.0/2024-08-09--0004-insert-into-nodes.sql	(revision a209f5e70f0c958d8194be6603925af122263e17)
+@@ -0,0 +1,14 @@
++INSERT INTO test_bd.nodes (
++    node_id, node_x, node_y, last_update, insert_date, "source",
++    updated_by, inserted_by, gdo_geometry
++) VALUES
++      (1, 100.0, 200.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source1', 'user1', 'user1', ST_GeomFromText('POINT(100 200)', 4326)),
++      (2, 101.0, 201.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source2', 'user2', 'user2', ST_GeomFromText('POINT(101 201)', 4326)),
++      (3, 102.0, 202.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source3', 'user3', 'user3', ST_GeomFromText('POINT(102 202)', 4326)),
++      (4, 103.0, 203.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source4', 'user4', 'user4', ST_GeomFromText('POINT(103 203)', 4326)),
++      (5, 104.0, 204.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source5', 'user5', 'user5', ST_GeomFromText('POINT(104 204)', 4326)),
++      (6, 105.0, 205.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source6', 'user6', 'user6', ST_GeomFromText('POINT(105 205)', 4326)),
++      (7, 106.0, 206.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source7', 'user7', 'user7', ST_GeomFromText('POINT(106 206)', 4326)),
++      (8, 107.0, 207.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source8', 'user8', 'user8', ST_GeomFromText('POINT(107 207)', 4326)),
++      (9, 108.0, 208.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source9', 'user9', 'user9', ST_GeomFromText('POINT(108 208)', 4326)),
++      (10, 109.0, 209.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Source10', 'user10', 'user10', ST_GeomFromText('POINT(109 209)', 4326));
+\ No newline at end of file
+Index: src/main/resources/db/changelog/data/1.0/2024-08-09--0005-insert-into-well_log_result_layers.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/data/1.0/2024-08-09--0005-insert-into-well_log_result_layers.sql b/src/main/resources/db/changelog/data/1.0/2024-08-09--0005-insert-into-well_log_result_layers.sql
+new file mode 100644
+--- /dev/null	(revision a209f5e70f0c958d8194be6603925af122263e17)
++++ b/src/main/resources/db/changelog/data/1.0/2024-08-09--0005-insert-into-well_log_result_layers.sql	(revision a209f5e70f0c958d8194be6603925af122263e17)
+@@ -0,0 +1,17 @@
++INSERT INTO test_bd.well_log_result_layers (
++    uwi, layer_id, wf_flag, "source", id_dict_layers, record_changed, insert_date,
++    top, base, top_dsrd, base_dsrd, ows, gos, ows_dsrd, gos_dsrd,
++    av_permeability, av_porosity, av_kng, inserted_by, updated_by,
++    version_id, version_current, gws, gws_dsrd, net_pay_thickness,
++    gross_thickness, start_gvk, gas_saturation_avg, sandstone_coef
++) VALUES
++      (40000001, 1, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 100.0, 200.0, 101.0, 201.0, 10.0, 20.0, 11.0, 21.0, 100.0, 0.2, 0.8, 'user1', 'user1', 1.0, 1.0, 30.0, 31.0, 50.0, 100.0, 150.0, 0.7, 0.9),
++      (40000002, 2, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 110.0, 210.0, 111.0, 211.0, 11.0, 21.0, 12.0, 22.0, 110.0, 0.21, 0.81, 'user2', 'user2', 1.0, 1.0, 31.0, 32.0, 51.0, 101.0, 151.0, 0.71, 0.91),
++      (40000003, 3, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 120.0, 220.0, 121.0, 221.0, 12.0, 22.0, 13.0, 23.0, 120.0, 0.22, 0.82, 'user3', 'user3', 1.0, 1.0, 32.0, 33.0, 52.0, 102.0, 152.0, 0.72, 0.92),
++      (40000004, 4, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 130.0, 230.0, 131.0, 231.0, 13.0, 23.0, 14.0, 24.0, 130.0, 0.23, 0.83, 'user4', 'user4', 1.0, 1.0, 33.0, 34.0, 53.0, 103.0, 153.0, 0.73, 0.93),
++      (40000005, 5, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 140.0, 240.0, 141.0, 241.0, 14.0, 24.0, 15.0, 25.0, 140.0, 0.24, 0.84, 'user5', 'user5', 1.0, 1.0, 34.0, 35.0, 54.0, 104.0, 154.0, 0.74, 0.94),
++      (40000006, 6, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 150.0, 250.0, 151.0, 251.0, 15.0, 25.0, 16.0, 26.0, 150.0, 0.25, 0.85, 'user6', 'user6', 1.0, 1.0, 35.0, 36.0, 55.0, 105.0, 155.0, 0.75, 0.95),
++      (40000007, 7, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 160.0, 260.0, 161.0, 261.0, 16.0, 26.0, 17.0, 27.0, 160.0, 0.26, 0.86, 'user7', 'user7', 1.0, 1.0, 36.0, 37.0, 56.0, 106.0, 156.0, 0.76, 0.96),
++      (40000008, 8, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 170.0, 270.0, 171.0, 271.0, 17.0, 27.0, 18.0, 28.0, 170.0, 0.27, 0.87, 'user8', 'user8', 1.0, 1.0, 37.0, 38.0, 57.0, 107.0, 157.0, 0.77, 0.97),
++      (40000009, 9, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 180.0, 280.0, 181.0, 281.0, 18.0, 28.0, 19.0, 29.0, 180.0, 0.28, 0.88, 'user9', 'user9', 1.0, 1.0, 38.0, 39.0, 58.0, 108.0, 158.0, 0.78, 0.98),
++      (40000010, 10, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 190.0, 290.0, 191.0, 291.0, 19.0, 29.0, 20.0, 30.0, 190.0, 0.29, 0.89, 'user10', 'user10', 1.0, 1.0, 39.0, 40.0, 59.0, 109.0, 159.0, 0.79, 0.99);
+\ No newline at end of file
+Index: src/main/resources/db/changelog/1.0/2024-08-09--0007-create-table-well_perforations.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/1.0/2024-08-09--0007-create-table-well_perforations.sql b/src/main/resources/db/changelog/1.0/2024-08-09--0007-create-table-well_perforations.sql
+new file mode 100644
+--- /dev/null	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/resources/db/changelog/1.0/2024-08-09--0007-create-table-well_perforations.sql	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
+@@ -0,0 +1,25 @@
++CREATE TABLE IF NOT EXISTS test_bd.well_perforations (
++                                                         rec_id bigserial NOT NULL,
++                                                         uwi int8 NULL,
++                                                         layer_id int8 NULL,
++                                                         perf_type int8 NULL,
++                                                         comp_type int8 NULL,
++                                                         "source" int8 NULL,
++                                                         comp_date timestamp NULL,
++                                                         close_date date NULL,
++                                                         top numeric NOT NULL,
++                                                         base numeric NULL,
++                                                         top_dsrd numeric NULL,
++                                                         base_dsrd numeric NULL,
++                                                         perf_shots int2 NULL,
++                                                         update_date timestamptz NULL,
++                                                         rejected int8 NULL,
++                                                         rec_type int8 NULL,
++                                                         perfs_per numeric NULL,
++                                                         remarks varchar(240) NULL,
++                                                         record_changed timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
++                                                         insert_date timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
++                                                         inserted_by varchar(30) NULL DEFAULT CURRENT_USER,
++                                                         updated_by varchar(30) NULL DEFAULT CURRENT_USER,
++                                                         CONSTRAINT pk_well_perforations PRIMARY KEY (rec_id)
++);
+Index: src/main/resources/db/changelog/data/1.0/2024-08-09--0006-insert-into-well_perforations.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/changelog/data/1.0/2024-08-09--0006-insert-into-well_perforations.sql b/src/main/resources/db/changelog/data/1.0/2024-08-09--0006-insert-into-well_perforations.sql
+new file mode 100644
+--- /dev/null	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/resources/db/changelog/data/1.0/2024-08-09--0006-insert-into-well_perforations.sql	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
+@@ -0,0 +1,15 @@
++INSERT INTO test_bd.well_perforations (
++    uwi, layer_id, perf_type, comp_type, "source", comp_date, close_date,
++    top, base, top_dsrd, base_dsrd, perf_shots, update_date, rejected,
++    rec_type, perfs_per, remarks, record_changed, insert_date, inserted_by, updated_by
++) VALUES
++      (40000001, 1, 1, 1, 1, '2024-01-01 00:00:00', '2024-12-31', 100.0, 200.0, 101.0, 201.0, 50, CURRENT_TIMESTAMP, 0, 1, 5.0, 'Remark 1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user1', 'user1'),
++      (40000002, 2, 1, 1, 1, '2024-01-02 00:00:00', '2024-12-30', 110.0, 210.0, 111.0, 211.0, 55, CURRENT_TIMESTAMP, 0, 1, 5.5, 'Remark 2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user2', 'user2'),
++      (40000003, 3, 1, 1, 1, '2024-01-03 00:00:00', '2024-12-29', 120.0, 220.0, 121.0, 221.0, 60, CURRENT_TIMESTAMP, 0, 1, 6.0, 'Remark 3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user3', 'user3'),
++      (40000004, 4, 1, 1, 1, '2024-01-04 00:00:00', '2024-12-28', 130.0, 230.0, 131.0, 231.0, 65, CURRENT_TIMESTAMP, 0, 1, 6.5, 'Remark 4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user4', 'user4'),
++      (40000005, 5, 1, 1, 1, '2024-01-05 00:00:00', '2024-12-27', 140.0, 240.0, 141.0, 241.0, 70, CURRENT_TIMESTAMP, 0, 1, 7.0, 'Remark 5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user5', 'user5'),
++      (40000006, 6, 1, 1, 1, '2024-01-06 00:00:00', '2024-12-26', 150.0, 250.0, 151.0, 251.0, 75, CURRENT_TIMESTAMP, 0, 1, 7.5, 'Remark 6', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user6', 'user6'),
++      (40000007, 7, 1, 1, 1, '2024-01-07 00:00:00', '2024-12-25', 160.0, 260.0, 161.0, 261.0, 80, CURRENT_TIMESTAMP, 0, 1, 8.0, 'Remark 7', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user7', 'user7'),
++      (40000008, 8, 1, 1, 1, '2024-01-08 00:00:00', '2024-12-24', 170.0, 270.0, 171.0, 271.0, 85, CURRENT_TIMESTAMP, 0, 1, 8.5, 'Remark 8', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user8', 'user8'),
++      (40000009, 9, 1, 1, 1, '2024-01-09 00:00:00', '2024-12-23', 180.0, 280.0, 181.0, 281.0, 90, CURRENT_TIMESTAMP, 0, 1, 9.0, 'Remark 9', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user9', 'user9'),
++      (40000010, 10, 1, 1, 1, '2024-01-10 00:00:00', '2024-12-22', 190.0, 290.0, 191.0, 291.0, 95, CURRENT_TIMESTAMP, 0, 1, 9.5, 'Remark 10', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'user10', 'user10');
+Index: src/main/java/ru/navilab/geoeditor/service/controller/NodeController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/controller/NodeController.java b/src/main/java/ru/navilab/geoeditor/service/controller/NodeController.java
+new file mode 100644
+--- /dev/null	(revision 5e545ce1d58a3235504888f2e6c7a5226b55f938)
++++ b/src/main/java/ru/navilab/geoeditor/service/controller/NodeController.java	(revision 5e545ce1d58a3235504888f2e6c7a5226b55f938)
+@@ -0,0 +1,28 @@
++package ru.navilab.geoeditor.service.controller;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.RestController;
++import ru.navilab.geoeditor.service.domain.Node;
++import ru.navilab.geoeditor.service.service.NodeService;
++
++import java.util.List;
++
++@RestController
++public class NodeController {
++
++    private final NodeService nodeService;
++
++    @Autowired
++    public NodeController(NodeService nodeService) {
++        this.nodeService = nodeService;
++    }
++
++    @GetMapping("/api/v1/{schema}/nodes")
++    public List<Node> getAllNodes(@PathVariable("schema") String schema) {
++        return nodeService.getAllNodes(schema);
++    }
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/domain/Node.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/domain/Node.java b/src/main/java/ru/navilab/geoeditor/service/domain/Node.java
+new file mode 100644
+--- /dev/null	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
++++ b/src/main/java/ru/navilab/geoeditor/service/domain/Node.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -0,0 +1,40 @@
++package ru.navilab.geoeditor.service.domain;
++
++import lombok.Data;
++import org.springframework.data.annotation.Id;
++import org.springframework.data.relational.core.mapping.Column;
++import org.springframework.data.relational.core.mapping.Table;
++
++import java.time.OffsetDateTime;
++
++@Data
++@Table("nodes")
++public class Node {
++    @Id
++    @Column("node_id")
++    private Long nodeId;
++
++    @Column("node_x")
++    private Double nodeX;
++
++    @Column("node_y")
++    private Double nodeY;
++
++    @Column("last_update")
++    private OffsetDateTime lastUpdate;
++
++    @Column("insert_date")
++    private OffsetDateTime insertDate;
++
++    @Column("source")
++    private String source;
++
++    @Column("updated_by")
++    private String updatedBy;
++
++    @Column("inserted_by")
++    private String insertedBy;
++
++    @Column("gdo_geometry")
++    private Object gdoGeometry; // лучше использовать тип Object, чтобы Spring Data JDBC могла автоматически преобразовать тип geometry из PostgreSQL
++}
+\ No newline at end of file
+Index: src/main/java/ru/navilab/geoeditor/service/repository/NodeRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/repository/NodeRepository.java b/src/main/java/ru/navilab/geoeditor/service/repository/NodeRepository.java
+new file mode 100644
+--- /dev/null	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
++++ b/src/main/java/ru/navilab/geoeditor/service/repository/NodeRepository.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -0,0 +1,8 @@
++package ru.navilab.geoeditor.service.repository;
++
++import org.springframework.data.repository.CrudRepository;
++import ru.navilab.geoeditor.service.domain.Node;
++
++public interface NodeRepository extends CrudRepository<Node, Long> {
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/NodeService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/NodeService.java b/src/main/java/ru/navilab/geoeditor/service/service/NodeService.java
+new file mode 100644
+--- /dev/null	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/NodeService.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -0,0 +1,9 @@
++package ru.navilab.geoeditor.service.service;
++
++import ru.navilab.geoeditor.service.domain.Node;
++
++import java.util.List;
++
++public interface NodeService {
++    List<Node> getAllNodes(String schema);
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/DictGServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/DictGServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/DictGServiceImpl.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/impl/DictGServiceImpl.java	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/DictGServiceImpl.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -1,6 +1,7 @@
+ package ru.navilab.geoeditor.service.service.impl;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.stereotype.Service;
+ import ru.navilab.geoeditor.service.dto.DictGDto;
+ import ru.navilab.geoeditor.service.repository.DictGRepository;
+@@ -17,7 +18,7 @@
+     private final DictGRepository dictGRepository;
+ 
+     @Autowired
+-    public DictGServiceImpl(SchemaService schemaService, DictGRepository dictGRepository) {
++    public DictGServiceImpl(@Qualifier("schemaServiceImpl") SchemaService schemaService, DictGRepository dictGRepository) {
+         this.schemaService = schemaService;
+         this.dictGRepository = dictGRepository;
+     }
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/LayerServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/LayerServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/LayerServiceImpl.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/impl/LayerServiceImpl.java	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/LayerServiceImpl.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -1,6 +1,7 @@
+ package ru.navilab.geoeditor.service.service.impl;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.stereotype.Service;
+ import org.springframework.transaction.annotation.Transactional;
+ import ru.navilab.geoeditor.service.dto.LayerDto;
+@@ -18,7 +19,7 @@
+     private final LayerRepository layerRepository;
+ 
+     @Autowired
+-    public LayerServiceImpl(SchemaService schemaService, LayerRepository layerRepository) {
++    public LayerServiceImpl(@Qualifier("schemaServiceImpl") SchemaService schemaService, LayerRepository layerRepository) {
+         this.schemaService = schemaService;
+         this.layerRepository = layerRepository;
+     }
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/NodeServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/NodeServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/NodeServiceImpl.java
+new file mode 100644
+--- /dev/null	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/NodeServiceImpl.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -0,0 +1,36 @@
++package ru.navilab.geoeditor.service.service.impl;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
++import org.springframework.stereotype.Service;
++import ru.navilab.geoeditor.service.domain.Node;
++import ru.navilab.geoeditor.service.repository.NodeRepository;
++import ru.navilab.geoeditor.service.service.NodeService;
++import ru.navilab.geoeditor.service.service.SchemaService;
++
++import java.util.Collections;
++import java.util.List;
++
++@Service
++public class NodeServiceImpl implements NodeService {
++
++    private final NodeRepository nodeRepository;
++
++    private final SchemaService schemaService;
++
++    @Autowired
++    public NodeServiceImpl(NodeRepository nodeRepository, @Qualifier("schemaServiceJdbcTemplate") SchemaService schemaService) {
++        this.nodeRepository = nodeRepository;
++        this.schemaService = schemaService;
++    }
++
++    @Override
++    public List<Node> getAllNodes(String schema) {
++        String[] schemaArray = {schema};
++        if (schemaService.setCurrSchema(schemaArray)) {
++            return (List<Node>) nodeRepository.findAll();
++        }
++        return Collections.emptyList();
++    }
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceImpl.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceImpl.java	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceImpl.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -8,7 +8,7 @@
+ import java.util.Arrays;
+ import java.util.List;
+ 
+-@Service
++@Service("schemaServiceImpl")
+ public class SchemaServiceImpl implements SchemaService {
+ 
+     private final SchemaRepository schemaRepository;
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceJdbcTemplate.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceJdbcTemplate.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceJdbcTemplate.java
+new file mode 100644
+--- /dev/null	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/SchemaServiceJdbcTemplate.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -0,0 +1,48 @@
++package ru.navilab.geoeditor.service.service.impl;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.jdbc.core.JdbcTemplate;
++import org.springframework.stereotype.Service;
++import ru.navilab.geoeditor.service.service.SchemaService;
++
++import java.util.List;
++
++@Service("schemaServiceJdbcTemplate")
++public class SchemaServiceJdbcTemplate implements SchemaService {
++
++    private final JdbcTemplate jdbcTemplate;
++
++    private String currentSchema;
++
++    @Autowired
++    public SchemaServiceJdbcTemplate(JdbcTemplate jdbcTemplate) {
++        this.jdbcTemplate = jdbcTemplate;
++    }
++
++    @Override
++    public String getCurrSchema() {
++        return currentSchema;
++    }
++
++    @Override
++    public boolean setCurrSchema(String[] schema) {
++        String firstSchema = schema[0];
++        if (isExist(firstSchema)) {
++            jdbcTemplate.execute("SET search_path TO " + firstSchema);
++            currentSchema = firstSchema;
++            return true;
++        }
++        return false;
++    }
++
++    @Override
++    public List<String> getAllSchemes() {
++        return jdbcTemplate.queryForList("SELECT schema_name FROM information_schema.schemata", String.class);
++    }
++
++    @Override
++    public boolean isExist(String schema) {
++        List<String> schemas = jdbcTemplate.queryForList("SELECT schema_name FROM information_schema.schemata WHERE schema_name = ?", String.class, schema);
++        return !schemas.isEmpty();
++    }
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/SublayerServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/SublayerServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/SublayerServiceImpl.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/impl/SublayerServiceImpl.java	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/SublayerServiceImpl.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -1,6 +1,7 @@
+ package ru.navilab.geoeditor.service.service.impl;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.stereotype.Service;
+ import org.springframework.transaction.annotation.Transactional;
+ import ru.navilab.geoeditor.service.domain.Sublayer;
+@@ -18,7 +19,7 @@
+     private final SchemaService schemaService;
+ 
+     @Autowired
+-    public SublayerServiceImpl(SublayerRepository sublayerRepository, SchemaService schemaService) {
++    public SublayerServiceImpl(SublayerRepository sublayerRepository, @Qualifier("schemaServiceImpl") SchemaService schemaService) {
+         this.sublayerRepository = sublayerRepository;
+         this.schemaService = schemaService;
+     }
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/SurfaceServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/SurfaceServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/SurfaceServiceImpl.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/impl/SurfaceServiceImpl.java	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/SurfaceServiceImpl.java	(revision c69a1c89c5854c64cbef7f995a36e29ea4a4169b)
+@@ -1,6 +1,7 @@
+ package ru.navilab.geoeditor.service.service.impl;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.stereotype.Service;
+ import org.springframework.transaction.annotation.Transactional;
+ import ru.navilab.geoeditor.service.domain.Surface;
+@@ -20,7 +21,7 @@
+     private final SurfaceRepository surfaceRepository;
+ 
+     @Autowired
+-    public SurfaceServiceImpl(SchemaService schemaService, SurfaceRepository surfaceRepository) {
++    public SurfaceServiceImpl(@Qualifier("schemaServiceImpl") SchemaService schemaService, SurfaceRepository surfaceRepository) {
+         this.schemaService = schemaService;
+         this.surfaceRepository = surfaceRepository;
+     }
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/WellHdrServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/WellHdrServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellHdrServiceImpl.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/impl/WellHdrServiceImpl.java	(revision 8d13d88c2e797c3d112dc983a1d6f3b8441df026)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellHdrServiceImpl.java	(revision a967bd82bc33cb1f930ec4e54c09678f9c800bb9)
+@@ -1,6 +1,7 @@
+ package ru.navilab.geoeditor.service.service.impl;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.stereotype.Service;
+ import org.springframework.transaction.annotation.Transactional;
+ import ru.navilab.geoeditor.service.domain.WellHdr;
+@@ -17,11 +18,15 @@
+ public class WellHdrServiceImpl implements WellHdrService {
+ 
+     private final SchemaService schemaService;
++    private final SchemaService schemaServiceJdbc;
+     private final WellHdrRepository wellHdrRepository;
+ 
+     @Autowired
+-    public WellHdrServiceImpl(SchemaService schemaService, WellHdrRepository wellHdrRepository) {
+-        this.schemaService = schemaService;
++    public WellHdrServiceImpl(@Qualifier("schemaServiceImpl") SchemaService schemaService,
++                              @Qualifier("schemaServiceJdbcTemplate") SchemaService schemaServiceJdbc,
++                              WellHdrRepository wellHdrRepository) {
++        this.schemaService = schemaService; // todo заменить на schemaServiceJdbc - более корректная реализация без исп. репозитория
++        this.schemaServiceJdbc = schemaServiceJdbc;
+         this.wellHdrRepository = wellHdrRepository;
+     }
+ 
+@@ -104,5 +109,14 @@
+             return Collections.emptyList();
+         }
+     }
++
++    @Override
++    public List<WellHdr> getAllWellsByProject(String schema) {
++        String[] schemaArray = {schema};
++        if (schemaServiceJdbc.setCurrSchema(schemaArray)) {
++            return (List<WellHdr>) wellHdrRepository.findAll();
++        }
++        return Collections.emptyList();
++    }
+ 
+ }
+Index: src/main/java/ru/navilab/geoeditor/service/controller/WellHdrController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/controller/WellHdrController.java b/src/main/java/ru/navilab/geoeditor/service/controller/WellHdrController.java
+--- a/src/main/java/ru/navilab/geoeditor/service/controller/WellHdrController.java	(revision 31e8a278f17611cfea230584cdd59e8acb71e9a6)
++++ b/src/main/java/ru/navilab/geoeditor/service/controller/WellHdrController.java	(revision a967bd82bc33cb1f930ec4e54c09678f9c800bb9)
+@@ -82,5 +82,11 @@
+         return wellHdrService.findBySurfaceName(project, surfaceName);
+     }
+ 
++    @Loggable
++    @ResponseStatus(HttpStatus.OK)
++    @GetMapping("/api/v1/{schema}/well-hdrs")
++    public List<WellHdr> getAllWellsByProject(@PathVariable("schema") String schema) {
++        return wellHdrService.getAllWellsByProject(schema);
++    }
+ 
+ }
+Index: src/main/java/ru/navilab/geoeditor/service/service/WellHdrService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/WellHdrService.java b/src/main/java/ru/navilab/geoeditor/service/service/WellHdrService.java
+--- a/src/main/java/ru/navilab/geoeditor/service/service/WellHdrService.java	(revision 31e8a278f17611cfea230584cdd59e8acb71e9a6)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/WellHdrService.java	(revision a967bd82bc33cb1f930ec4e54c09678f9c800bb9)
+@@ -24,4 +24,6 @@
+ 
+     List<WellHdrDto> findBySurfaceName(String project, String surfaceName);
+ 
++    List<WellHdr> getAllWellsByProject(String schema);
++
+ }
+Index: src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultLayerController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultLayerController.java b/src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultLayerController.java
+new file mode 100644
+--- /dev/null	(revision 5e545ce1d58a3235504888f2e6c7a5226b55f938)
++++ b/src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultLayerController.java	(revision 5e545ce1d58a3235504888f2e6c7a5226b55f938)
+@@ -0,0 +1,27 @@
++package ru.navilab.geoeditor.service.controller;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.RestController;
++import ru.navilab.geoeditor.service.domain.WellLogResultLayers;
++import ru.navilab.geoeditor.service.service.WellLogResultLayerService;
++
++import java.util.List;
++
++@RestController
++public class WellLogResultLayerController {
++
++    private final WellLogResultLayerService wellLogResultLayerService;
++
++    @Autowired
++    public WellLogResultLayerController(WellLogResultLayerService wellLogResultLayerService) {
++        this.wellLogResultLayerService = wellLogResultLayerService;
++    }
++
++    @GetMapping("/api/v1/{schema}/well-log-result-layers")
++    public List<WellLogResultLayers> getAllWellLogResultLayer(@PathVariable("schema") String schema) {
++        return wellLogResultLayerService.getAllWellLogResultLayers(schema);
++    }
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultLayerRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultLayerRepository.java b/src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultLayerRepository.java
+new file mode 100644
+--- /dev/null	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
++++ b/src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultLayerRepository.java	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
+@@ -0,0 +1,8 @@
++package ru.navilab.geoeditor.service.repository;
++
++import org.springframework.data.repository.CrudRepository;
++import ru.navilab.geoeditor.service.domain.WellLogResultLayers;
++
++public interface WellLogResultLayerRepository extends CrudRepository<WellLogResultLayers, Long> {
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/WellLogResultLayerService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/WellLogResultLayerService.java b/src/main/java/ru/navilab/geoeditor/service/service/WellLogResultLayerService.java
+new file mode 100644
+--- /dev/null	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/WellLogResultLayerService.java	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
+@@ -0,0 +1,9 @@
++package ru.navilab.geoeditor.service.service;
++
++import ru.navilab.geoeditor.service.domain.WellLogResultLayers;
++
++import java.util.List;
++
++public interface WellLogResultLayerService {
++    List<WellLogResultLayers> getAllWellLogResultLayers(String schema);
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultLayerServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultLayerServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultLayerServiceImpl.java
+new file mode 100644
+--- /dev/null	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultLayerServiceImpl.java	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
+@@ -0,0 +1,33 @@
++package ru.navilab.geoeditor.service.service.impl;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
++import org.springframework.stereotype.Service;
++import ru.navilab.geoeditor.service.domain.WellLogResultLayers;
++import ru.navilab.geoeditor.service.repository.WellLogResultLayerRepository;
++import ru.navilab.geoeditor.service.service.SchemaService;
++import ru.navilab.geoeditor.service.service.WellLogResultLayerService;
++
++import java.util.Collections;
++import java.util.List;
++
++@Service
++public class WellLogResultLayerServiceImpl implements WellLogResultLayerService {
++
++    private final WellLogResultLayerRepository repository;
++    private final SchemaService schemaService;
++
++    @Autowired
++    public WellLogResultLayerServiceImpl(WellLogResultLayerRepository repository, @Qualifier("schemaServiceJdbcTemplate") SchemaService schemaService) {
++        this.repository = repository;
++        this.schemaService = schemaService;
++    }
++
++    @Override
++    public List<WellLogResultLayers> getAllWellLogResultLayers(String schema) {
++        String[] schemaArray = {schema};
++        if (schemaService.setCurrSchema(schemaArray)) {
++            return (List<WellLogResultLayers>) repository.findAll();
++        }
++        return Collections.emptyList();
++    }
++}
+Index: src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultSublayersController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultSublayersController.java b/src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultSublayersController.java
+new file mode 100644
+--- /dev/null	(revision 5e545ce1d58a3235504888f2e6c7a5226b55f938)
++++ b/src/main/java/ru/navilab/geoeditor/service/controller/WellLogResultSublayersController.java	(revision 5e545ce1d58a3235504888f2e6c7a5226b55f938)
+@@ -0,0 +1,26 @@
++package ru.navilab.geoeditor.service.controller;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.RestController;
++import ru.navilab.geoeditor.service.domain.WellLogResultSublayers;
++import ru.navilab.geoeditor.service.service.WellLogResultSublayersService;
++
++import java.util.List;
++
++@RestController
++public class WellLogResultSublayersController {
++
++    private final WellLogResultSublayersService sublayersService;
++
++    @Autowired
++    public WellLogResultSublayersController(WellLogResultSublayersService sublayersService) {
++        this.sublayersService = sublayersService;
++    }
++
++    @GetMapping("/api/v1/{schema}/well-log-result-sublayers")
++    public List<WellLogResultSublayers> getAllSublayers(@PathVariable("schema") String schema) {
++        return sublayersService.getAllSublayers(schema);
++    }
++}
+Index: src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultSublayers.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultSublayers.java b/src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultSublayers.java
+new file mode 100644
+--- /dev/null	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
++++ b/src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultSublayers.java	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
+@@ -0,0 +1,252 @@
++package ru.navilab.geoeditor.service.domain;
++
++import lombok.Data;
++import org.springframework.data.annotation.Id;
++import org.springframework.data.relational.core.mapping.Column;
++import org.springframework.data.relational.core.mapping.Table;
++
++import java.math.BigDecimal;
++import java.time.OffsetDateTime;
++
++@Data
++@Table("well_log_result_sublayers")
++public class WellLogResultSublayers {
++
++    @Id
++    @Column("id")
++    private Long id;
++
++    @Column("uwi")
++    private Long uwi;
++
++    @Column("source")
++    private Long source;
++
++    @Column("layer_id")
++    private Long layerId;
++
++    @Column("lithology")
++    private Long lithology;
++
++    @Column("saturation")
++    private Long saturation;
++
++    @Column("saturation_gm")
++    private Long saturationGm;
++
++    @Column("wf_type")
++    private Long wfType;
++
++    @Column("collector_type")
++    private Long collectorType;
++
++    @Column("interpretation_type")
++    private Long interpretationType;
++
++    @Column("interpreter")
++    private Integer interpreter;
++
++    @Column("id_dict_layers")
++    private Integer idDictLayers;
++
++    @Column("top")
++    private BigDecimal top;
++
++    @Column("base")
++    private BigDecimal base;
++
++    @Column("top_dsrd")
++    private BigDecimal topDsrd;
++
++    @Column("base_dsrd")
++    private BigDecimal baseDsrd;
++
++    @Column("permeability")
++    private BigDecimal permeability;
++
++    @Column("porosity")
++    private BigDecimal porosity;
++
++    @Column("dif_par_g")
++    private BigDecimal difParG;
++
++    @Column("dif_par_n")
++    private BigDecimal difParN;
++
++    @Column("rel_par_g")
++    private BigDecimal relParG;
++
++    @Column("rel_par_n")
++    private BigDecimal relParN;
++
++    @Column("rel_par_sp")
++    private BigDecimal relParSp;
++
++    @Column("r")
++    private BigDecimal r;
++
++    @Column("kg")
++    private BigDecimal kg;
++
++    @Column("kng")
++    private BigDecimal kng;
++
++    @Column("clay")
++    private BigDecimal clay;
++
++    @Column("h")
++    private BigDecimal h;
++
++    @Column("porosity_e")
++    private BigDecimal porosityE;
++
++    @Column("porosity_o")
++    private BigDecimal porosityO;
++
++    @Column("r_ak")
++    private BigDecimal rAk;
++
++    @Column("r_nktb")
++    private BigDecimal rNktb;
++
++    @Column("r_nkts")
++    private BigDecimal rNkts;
++
++    @Column("r_gk")
++    private BigDecimal rGk;
++
++    @Column("r_ggkp")
++    private BigDecimal rGgkp;
++
++    @Column("distortion")
++    private Long distortion;
++
++    @Column("last_update")
++    private OffsetDateTime lastUpdate;
++
++    @Column("record_changed")
++    private OffsetDateTime recordChanged;
++
++    @Column("insert_date")
++    private OffsetDateTime insertDate;
++
++    @Column("inserted_by")
++    private String insertedBy;
++
++    @Column("updated_by")
++    private String updatedBy;
++
++    @Column("r_bk")
++    private BigDecimal rBk;
++
++    @Column("r_ik")
++    private BigDecimal rIk;
++
++    @Column("d_well")
++    private BigDecimal dWell;
++
++    @Column("rel_dz")
++    private BigDecimal relDz;
++
++    @Column("kvo")
++    private BigDecimal kvo;
++
++    @Column("porosity_ak")
++    private BigDecimal porosityAk;
++
++    @Column("porosity_nkt")
++    private BigDecimal porosityNkt;
++
++    @Column("porosity_sp")
++    private BigDecimal porositySp;
++
++    @Column("porosity_ggk")
++    private BigDecimal porosityGgk;
++
++    @Column("porosity_gk")
++    private BigDecimal porosityGk;
++
++    @Column("porosity_ngk")
++    private BigDecimal porosityNgk;
++
++    @Column("porosity_nnkt")
++    private BigDecimal porosityNnkt;
++
++    @Column("porosity_kv")
++    private BigDecimal porosityKv;
++
++    @Column("porosity_tr")
++    private BigDecimal porosityTr;
++
++    @Column("porosity_sv")
++    private BigDecimal porositySv;
++
++    @Column("rel_par_gg")
++    private BigDecimal relParGg;
++
++    @Column("rel_par_ak")
++    private BigDecimal relParAk;
++
++    @Column("rc")
++    private BigDecimal rc;
++
++    @Column("r_bmk")
++    private BigDecimal rBmk;
++
++    @Column("r_gz")
++    private BigDecimal rGz;
++
++    @Column("r_gz1")
++    private BigDecimal rGz1;
++
++    @Column("r_gz2")
++    private BigDecimal rGz2;
++
++    @Column("r_gz3")
++    private BigDecimal rGz3;
++
++    @Column("r_gz4")
++    private BigDecimal rGz4;
++
++    @Column("r_ikm")
++    private BigDecimal rIkm;
++
++    @Column("rc_zp")
++    private BigDecimal rcZp;
++
++    @Column("r_nkt")
++    private BigDecimal rNkt;
++
++    @Column("r_ngk")
++    private BigDecimal rNgk;
++
++    @Column("r_ogz")
++    private BigDecimal rOgz;
++
++    @Column("r_pz")
++    private BigDecimal rPz;
++
++    @Column("kv")
++    private BigDecimal kv;
++
++    @Column("ks")
++    private BigDecimal ks;
++
++    @Column("oil_porosity")
++    private BigDecimal oilPorosity;
++
++    @Column("r_gz05")
++    private BigDecimal rGz05;
++
++    @Column("ngk_unit")
++    private BigDecimal ngkUnit;
++
++    @Column("height_eff")
++    private BigDecimal heightEff;
++
++    @Column("version_id")
++    private BigDecimal versionId;
++
++    @Column("version_current")
++    private BigDecimal versionCurrent;
++}
+Index: src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultSublayersRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultSublayersRepository.java b/src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultSublayersRepository.java
+new file mode 100644
+--- /dev/null	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
++++ b/src/main/java/ru/navilab/geoeditor/service/repository/WellLogResultSublayersRepository.java	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
+@@ -0,0 +1,8 @@
++package ru.navilab.geoeditor.service.repository;
++
++import org.springframework.data.repository.CrudRepository;
++import ru.navilab.geoeditor.service.domain.WellLogResultSublayers;
++
++public interface WellLogResultSublayersRepository extends CrudRepository<WellLogResultSublayers, Long> {
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/WellLogResultSublayersService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/WellLogResultSublayersService.java b/src/main/java/ru/navilab/geoeditor/service/service/WellLogResultSublayersService.java
+new file mode 100644
+--- /dev/null	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/WellLogResultSublayersService.java	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
+@@ -0,0 +1,11 @@
++package ru.navilab.geoeditor.service.service;
++
++import ru.navilab.geoeditor.service.domain.WellLogResultSublayers;
++
++import java.util.List;
++
++public interface WellLogResultSublayersService {
++
++    List<WellLogResultSublayers> getAllSublayers(String schema);
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultSublayersServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultSublayersServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultSublayersServiceImpl.java
+new file mode 100644
+--- /dev/null	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellLogResultSublayersServiceImpl.java	(revision 7f68ad967fe2e3ddbb1fd514b0d8d3b78e9c281e)
+@@ -0,0 +1,35 @@
++package ru.navilab.geoeditor.service.service.impl;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
++import org.springframework.stereotype.Service;
++import ru.navilab.geoeditor.service.domain.WellLogResultSublayers;
++import ru.navilab.geoeditor.service.repository.WellLogResultSublayersRepository;
++import ru.navilab.geoeditor.service.service.SchemaService;
++import ru.navilab.geoeditor.service.service.WellLogResultSublayersService;
++
++import java.util.Collections;
++import java.util.List;
++
++@Service
++public class WellLogResultSublayersServiceImpl implements WellLogResultSublayersService {
++
++    private final WellLogResultSublayersRepository sublayersRepository;
++    private final SchemaService schemaService;
++
++    @Autowired
++    public WellLogResultSublayersServiceImpl(WellLogResultSublayersRepository sublayersRepository,
++                                             @Qualifier("schemaServiceJdbcTemplate") SchemaService schemaService) {
++        this.sublayersRepository = sublayersRepository;
++        this.schemaService = schemaService;
++    }
++
++    @Override
++    public List<WellLogResultSublayers> getAllSublayers(String schema) {
++        String[] schemaArray = {schema};
++        if (schemaService.setCurrSchema(schemaArray)) {
++            return (List<WellLogResultSublayers>) sublayersRepository.findAll();
++        }
++        return Collections.emptyList();
++    }
++}
+Index: src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultLayers.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultLayers.java b/src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultLayers.java
+new file mode 100644
+--- /dev/null	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
++++ b/src/main/java/ru/navilab/geoeditor/service/domain/WellLogResultLayers.java	(revision 2b99e43409920efee31f8c23e53a5bfc4ad42725)
+@@ -0,0 +1,104 @@
++package ru.navilab.geoeditor.service.domain;
++
++import lombok.Data;
++import org.springframework.data.annotation.Id;
++import org.springframework.data.relational.core.mapping.Column;
++import org.springframework.data.relational.core.mapping.Table;
++
++import java.math.BigDecimal;
++import java.time.OffsetDateTime;
++
++@Data
++@Table("well_log_result_layers")
++public class WellLogResultLayers {
++    @Id
++    @Column("id")
++    private Long id;
++
++    @Column("uwi")
++    private Long uwi;
++
++    @Column("layer_id")
++    private Long layerId;
++
++    @Column("wf_flag")
++    private Long wfFlag;
++
++    @Column("source")
++    private Long source;
++
++    @Column("id_dict_layers")
++    private Integer idDictLayers;
++
++    @Column("record_changed")
++    private OffsetDateTime recordChanged;
++
++    @Column("insert_date")
++    private OffsetDateTime insertDate;
++
++    @Column("top")
++    private BigDecimal top;
++
++    @Column("base")
++    private BigDecimal base;
++
++    @Column("top_dsrd")
++    private BigDecimal topDsrd;
++
++    @Column("base_dsrd")
++    private BigDecimal baseDsrd;
++
++    @Column("ows")
++    private BigDecimal ows;
++
++    @Column("gos")
++    private BigDecimal gos;
++
++    @Column("ows_dsrd")
++    private BigDecimal owsDsrd;
++
++    @Column("gos_dsrd")
++    private BigDecimal gosDsrd;
++
++    @Column("av_permeability")
++    private BigDecimal avPermeability;
++
++    @Column("av_porosity")
++    private BigDecimal avPorosity;
++
++    @Column("av_kng")
++    private BigDecimal avKng;
++
++    @Column("inserted_by")
++    private String insertedBy;
++
++    @Column("updated_by")
++    private String updatedBy;
++
++    @Column("version_id")
++    private BigDecimal versionId;
++
++    @Column("version_current")
++    private BigDecimal versionCurrent;
++
++    @Column("gws")
++    private BigDecimal gws;
++
++    @Column("gws_dsrd")
++    private BigDecimal gwsDsrd;
++
++    @Column("net_pay_thickness")
++    private BigDecimal netPayThickness;
++
++    @Column("gross_thickness")
++    private BigDecimal grossThickness;
++
++    @Column("start_gvk")
++    private BigDecimal startGvk;
++
++    @Column("gas_saturation_avg")
++    private BigDecimal gasSaturationAvg;
++
++    @Column("sandstone_coef")
++    private BigDecimal sandstoneCoef;
++}
+Index: src/main/java/ru/navilab/geoeditor/service/controller/WellPerforationsController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/controller/WellPerforationsController.java b/src/main/java/ru/navilab/geoeditor/service/controller/WellPerforationsController.java
+new file mode 100644
+--- /dev/null	(revision 271ba9b4673db165256e74d0878c8a87d9aa21f6)
++++ b/src/main/java/ru/navilab/geoeditor/service/controller/WellPerforationsController.java	(revision 271ba9b4673db165256e74d0878c8a87d9aa21f6)
+@@ -0,0 +1,28 @@
++package ru.navilab.geoeditor.service.controller;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.PostMapping;
++import org.springframework.web.bind.annotation.RequestBody;
++import org.springframework.web.bind.annotation.RestController;
++import ru.navilab.geoeditor.service.domain.WellPerforations;
++import ru.navilab.geoeditor.service.service.WellPerforationsService;
++
++import java.util.List;
++
++@RestController
++public class WellPerforationsController {
++
++    private final WellPerforationsService wellPerforationsService;
++
++    @Autowired
++    public WellPerforationsController(WellPerforationsService wellPerforationsService) {
++        this.wellPerforationsService = wellPerforationsService;
++    }
++
++    @PostMapping("/api/v1/{schema}/well-perforations")
++    public List<WellPerforations> getWellPerforations(@PathVariable("schema") String schema, @RequestBody List<Long> uwis) {
++        return wellPerforationsService.getWellPerforations(schema, uwis);
++    }
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/domain/WellPerforations.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/domain/WellPerforations.java b/src/main/java/ru/navilab/geoeditor/service/domain/WellPerforations.java
+new file mode 100644
+--- /dev/null	(revision e8cc35b694002124cb69ca58e39ac35ffe10cfd0)
++++ b/src/main/java/ru/navilab/geoeditor/service/domain/WellPerforations.java	(revision e8cc35b694002124cb69ca58e39ac35ffe10cfd0)
+@@ -0,0 +1,81 @@
++package ru.navilab.geoeditor.service.domain;
++
++import lombok.Data;
++import org.springframework.data.annotation.Id;
++import org.springframework.data.relational.core.mapping.Column;
++import org.springframework.data.relational.core.mapping.Table;
++
++import java.math.BigDecimal;
++import java.time.LocalDate;
++
++@Data
++@Table("well_perforations")
++public class WellPerforations {
++    @Id
++    @Column("rec_id")
++    private Long recId;
++
++    @Column("uwi")
++    private Long uwi;
++
++    @Column("layer_id")
++    private Long layerId;
++
++    @Column("perf_type")
++    private Long perfType;
++
++    @Column("comp_type")
++    private Long compType;
++
++    @Column("source")
++    private Long source;
++
++    @Column("comp_date")
++    private LocalDate compDate;
++
++    @Column("close_date")
++    private LocalDate closeDate;
++
++    @Column("top")
++    private BigDecimal top;
++
++    @Column("base")
++    private BigDecimal base;
++
++    @Column("top_dsrd")
++    private BigDecimal topDsrd;
++
++    @Column("base_dsrd")
++    private BigDecimal baseDsrd;
++
++    @Column("perf_shots")
++    private Short perfShots;
++
++    @Column("update_date")
++    private LocalDate updateDate;
++
++    @Column("rejected")
++    private Long rejected;
++
++    @Column("rec_type")
++    private Long recType;
++
++    @Column("perfs_per")
++    private BigDecimal perfsPer;
++
++    @Column("remarks")
++    private String remarks;
++
++    @Column("record_changed")
++    private LocalDate recordChanged;
++
++    @Column("insert_date")
++    private LocalDate insertDate;
++
++    @Column("inserted_by")
++    private String insertedBy;
++
++    @Column("updated_by")
++    private String updatedBy;
++}
++
+Index: src/main/java/ru/navilab/geoeditor/service/repository/WellPerforationsRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/repository/WellPerforationsRepository.java b/src/main/java/ru/navilab/geoeditor/service/repository/WellPerforationsRepository.java
+new file mode 100644
+--- /dev/null	(revision e8cc35b694002124cb69ca58e39ac35ffe10cfd0)
++++ b/src/main/java/ru/navilab/geoeditor/service/repository/WellPerforationsRepository.java	(revision e8cc35b694002124cb69ca58e39ac35ffe10cfd0)
+@@ -0,0 +1,15 @@
++package ru.navilab.geoeditor.service.repository;
++
++import org.springframework.data.jdbc.repository.query.Query;
++import org.springframework.data.repository.CrudRepository;
++import org.springframework.data.repository.query.Param;
++import ru.navilab.geoeditor.service.domain.WellPerforations;
++
++import java.util.List;
++
++public interface WellPerforationsRepository extends CrudRepository<WellPerforations, Long> {
++
++    @Query("SELECT * FROM WELL_PERFORATIONS WHERE uwi IN (:uwis)")
++    List<WellPerforations> findByUwiIn(@Param("uwis") List<Long> uwis);
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/WellPerforationsService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/WellPerforationsService.java b/src/main/java/ru/navilab/geoeditor/service/service/WellPerforationsService.java
+new file mode 100644
+--- /dev/null	(revision f3a0703b887a88c9d6ff9bab6b736e5e49941239)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/WellPerforationsService.java	(revision f3a0703b887a88c9d6ff9bab6b736e5e49941239)
+@@ -0,0 +1,11 @@
++package ru.navilab.geoeditor.service.service;
++
++import ru.navilab.geoeditor.service.domain.WellPerforations;
++
++import java.util.List;
++
++public interface WellPerforationsService {
++
++    List<WellPerforations> getWellPerforations(String schema, List<Long> uwis);
++
++}
+Index: src/main/java/ru/navilab/geoeditor/service/service/impl/WellPerforationsServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ru/navilab/geoeditor/service/service/impl/WellPerforationsServiceImpl.java b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellPerforationsServiceImpl.java
+new file mode 100644
+--- /dev/null	(revision 2f52f219e2e01fe88f00764fcda6c4c3554c2007)
++++ b/src/main/java/ru/navilab/geoeditor/service/service/impl/WellPerforationsServiceImpl.java	(revision 2f52f219e2e01fe88f00764fcda6c4c3554c2007)
+@@ -0,0 +1,36 @@
++package ru.navilab.geoeditor.service.service.impl;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Qualifier;
++import org.springframework.stereotype.Service;
++import ru.navilab.geoeditor.service.domain.WellPerforations;
++import ru.navilab.geoeditor.service.repository.WellPerforationsRepository;
++import ru.navilab.geoeditor.service.service.SchemaService;
++import ru.navilab.geoeditor.service.service.WellPerforationsService;
++
++import java.util.Collections;
++import java.util.List;
++
++@Service
++public class WellPerforationsServiceImpl implements WellPerforationsService {
++
++    private final WellPerforationsRepository wellPerforationsRepository;
++    private final SchemaService schemaService;
++
++    @Autowired
++    public WellPerforationsServiceImpl(WellPerforationsRepository wellPerforationsRepository,
++                                       @Qualifier("schemaServiceJdbcTemplate") SchemaService schemaService) {
++        this.wellPerforationsRepository = wellPerforationsRepository;
++        this.schemaService = schemaService;
++    }
++
++    @Override
++    public List<WellPerforations> getWellPerforations(String schema, List<Long> uwis) {
++        String[] schemaArray = {schema};
++        if (schemaService.setCurrSchema(schemaArray)) {
++            return wellPerforationsRepository.findByUwiIn(uwis);
++        }
++        return Collections.emptyList();
++    }
++
++}
+diff --git a/src/main/resources/db/changelog/data/1.0/2024-08-09--0001-well_hdr.sql b/src/main/resources/db/changelog/data/1.0/2024-08-09--0001-insert-into-well_hdr.sql
+rename from src/main/resources/db/changelog/data/1.0/2024-08-09--0001-well_hdr.sql
+rename to src/main/resources/db/changelog/data/1.0/2024-08-09--0001-insert-into-well_hdr.sql
+diff --git a/src/main/resources/db/changelog/data/1.0/2024-08-09--0002-well_log_result_sublayers.sql b/src/main/resources/db/changelog/data/1.0/2024-08-09--0002-insert-into-well_log_result_sublayers.sql
+rename from src/main/resources/db/changelog/data/1.0/2024-08-09--0002-well_log_result_sublayers.sql
+rename to src/main/resources/db/changelog/data/1.0/2024-08-09--0002-insert-into-well_log_result_sublayers.sql
+diff --git a/src/main/resources/db/changelog/data/1.0/2024-08-09--0003-well_surface_pick.sql b/src/main/resources/db/changelog/data/1.0/2024-08-09--0003-insert-into-well_surface_pick.sql
+rename from src/main/resources/db/changelog/data/1.0/2024-08-09--0003-well_surface_pick.sql
+rename to src/main/resources/db/changelog/data/1.0/2024-08-09--0003-insert-into-well_surface_pick.sql
